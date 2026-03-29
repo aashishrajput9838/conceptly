@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircle, ArrowRight, BrainCircuit } from 'lucide-react';
+import { PlayCircle, ArrowRight, BrainCircuit, Play } from 'lucide-react';
+
+import { useNavigate } from 'react-router-dom';
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-[#0f172a]">
       {/* Animated Gradients */}
@@ -31,22 +34,22 @@ export const HeroSection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('explainer')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-shadow"
-            >
-              Start Learning <ArrowRight className="w-5 h-5" />
-            </motion.button>
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => document.getElementById('chat')?.scrollIntoView({ behavior: 'smooth' })}
-              className="glass text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
-            >
-              Watch Demo <PlayCircle className="w-5 h-5" />
-            </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/explore')}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold shadow-[0_4px_20px_rgba(139,92,246,0.4)] transition-all flex items-center justify-center gap-2"
+              >
+                Start Learning <ArrowRight className="w-5 h-5" />
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/dashboard')}
+                className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-full font-bold transition-all flex items-center justify-center gap-2"
+              >
+                Watch Demo <Play className="w-5 h-5" />
+              </motion.button>
           </div>
         </motion.div>
 

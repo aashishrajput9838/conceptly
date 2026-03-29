@@ -1,5 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import { generateGroqRoadmap } from '../lib/groq';
+
+export interface RoadmapMilestone {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  difficulty: string;
+  status: 'completed' | 'current' | 'locked';
+}
 
 interface DashboardStats {
   accuracy: number;
@@ -16,6 +26,13 @@ interface AppContextProps {
   // Navigation State
   activeQuizTopic: string;
   setActiveQuizTopic: (topic: string) => void;
+  
+  // Roadmap State
+  roadmapGoal: string;
+  setRoadmapGoal: (goal: string) => void;
+  milestones: RoadmapMilestone[];
+  isGeneratingRoadmap: boolean;
+  generateRoadmap: (goal: string) => Promise<void>;
   
   // Chart Data
   weeklyData: { name: string; score: number }[];
@@ -52,33 +69,51 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [activeQuizTopic, setActiveQuizTopic] = useState('Java Programming');
   const [weeklyData, setWeeklyData] = useState(initialWeeklyData);
   const [subjectProgress, setSubjectProgress] = useState(initialSubjectProgress);
+  
+  // Roadmap State
+  const [roadmapGoal, setRoadmapGoal] = useState('');
+  const [milestones, setMilestones] = useState<RoadmapMilestone[]>([]);
+  const [isGeneratingRoadmap, setIsGeneratingRoadmap] = useState(false);
+
+  const generateRoadmap = useCallback(async (goal: string) => {
+    if (!goal.trim()) return;
+    setRoadmapGoal(goal);
+    setIsGeneratingRoadmap(true);
+    try {
+      const data = await generateGroqRoadmap(goal);
+      if (data && data.milestones) {
+        // Set first one to current, others locked
+        const formatted = data.milestones.map((m: any, i: number) => ({
+          ...m,
+          status: i === 0 ? 'current' : 'locked'
+        }));
+        setMilestones(formatted);
+      }
+    } catch (error) {
+      console.error("Roadmap generation failed:", error);
+    } finally {
+      setIsGeneratingRoadmap(false);
+    }
+  }, []);
 
   const updateStatsFromQuiz = (score: number, total: number) => {
     const percentage = Math.round((score / total) * 100);
     
-    // Smoothly update stats based on recent performance
     setStats(prev => ({
       ...prev,
-      accuracy: Math.round((prev.accuracy * 0.7) + (percentage * 0.3)), // Rolling average
+      accuracy: Math.round((prev.accuracy * 0.7) + (percentage * 0.3)),
       quizCompletion: Math.min(100, prev.quizCompletion + 5),
       streak: prev.streak + 1,
       hoursStudied: parseFloat((prev.hoursStudied + 0.5).toFixed(1))
     }));
 
-    // Update the chart (fake a new data point or just bump 'Today')
-    setWeeklyData(prev => {
-      return prev.map((item, index) => {
-        if (index === prev.length - 1) {
-          return {
-            ...item,
-            score: Math.min(100, Math.round((item.score + percentage) / 2))
-          };
-        }
-        return item;
-      });
-    });
+    setWeeklyData(prev => prev.map((item, index) => {
+      if (index === prev.length - 1) {
+        return { ...item, score: Math.min(100, Math.round((item.score + percentage) / 2)) };
+      }
+      return item;
+    }));
 
-    // Update a random subject progress
     setSubjectProgress(prev => {
       const newData = [...prev];
       if (activeQuizTopic.includes('Math')) newData[0].progress = Math.min(100, newData[0].progress + 5);
@@ -94,6 +129,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       updateStatsFromQuiz,
       activeQuizTopic,
       setActiveQuizTopic,
+      roadmapGoal,
+      setRoadmapGoal,
+      milestones,
+      isGeneratingRoadmap,
+      generateRoadmap,
       weeklyData,
       subjectProgress
     }}>

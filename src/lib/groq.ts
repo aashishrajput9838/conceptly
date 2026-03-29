@@ -60,3 +60,38 @@ export const generateGroqExplanation = async (topic: string, difficulty: string)
   
   return completion.choices[0]?.message?.content || "";
 };
+/**
+ * Roadmap Generation
+ */
+export const generateGroqRoadmap = async (goal: string) => {
+  const prompt = `Create a detailed, beautiful flowchart-style learning roadmap for the goal: "${goal}".
+  
+  Return the response as a valid JSON object with a single key "milestones" which is an array of exactly 8 steps.
+  
+  Each step object must have:
+  - id: (string) unique ID
+  - title: (string) Name of the stage (e.g., "Basics", "Advanced Hooks")
+  - description: (string) Brief 1-2 sentence description of what the user will learn
+  - duration: (string) Estimated time (e.g., "3 days", "1 week")
+  - difficulty: (string) One of "Beginner", "Intermediate", "Advanced"
+  - status: "locked" (default)
+  
+  Example structure (Programming): Basics -> Variables -> Loops -> Functions -> Arrays -> OOP -> DSA -> Projects.
+  
+  Ensure the JSON is strictly correctly formatted.`;
+
+  const completion = await groq.chat.completions.create({
+    messages: [
+      {
+        role: "system",
+        content: "You are the Conceptly Roadmap AI. You provide structured, step-by-step learning paths in JSON format ONLY."
+      },
+      { role: "user", content: prompt }
+    ],
+    model: "llama-3.3-70b-versatile",
+    response_format: { type: "json_object" },
+  });
+  
+  const content = completion.choices[0]?.message?.content || "{\"milestones\": []}";
+  return JSON.parse(content);
+};

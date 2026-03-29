@@ -4,7 +4,7 @@ import { Calculator, FlaskConical, Code2, Hourglass, BookOpen, Briefcase, ArrowR
 import { useAppContext } from '../../context/AppContext';
 
 export const SubjectsSection = () => {
-  const { setActiveQuizTopic } = useAppContext();
+  const { setActiveQuizTopic, generateRoadmap } = useAppContext();
 
   const subjects = [
     {
@@ -46,10 +46,10 @@ export const SubjectsSection = () => {
   ];
 
   const handleExplore = (topicTarget: string) => {
-    setActiveQuizTopic(topicTarget);
-    const quizSection = document.getElementById('quiz');
-    if (quizSection) {
-      quizSection.scrollIntoView({ behavior: 'smooth' });
+    generateRoadmap(topicTarget);
+    const roadmapSection = document.getElementById('learning-path');
+    if (roadmapSection) {
+      roadmapSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 

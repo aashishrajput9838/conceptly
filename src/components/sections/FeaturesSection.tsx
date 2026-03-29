@@ -1,52 +1,47 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BrainCircuit, Sparkles, TrendingUp, MessageSquareMore, Activity, Route } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BrainCircuit, Sparkles, TrendingUp, MessageSquareMore, Activity, Route, ArrowUpRight } from 'lucide-react';
 
 export const FeaturesSection = () => {
-  const scrollToSection = (id: string | undefined) => {
-    if (!id) return;
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const navigate = useNavigate();
 
   const features = [
     {
       icon: <BrainCircuit className="w-8 h-8 text-purple-400" />,
       title: "AI Concept Explainer",
       description: "Explains any topic from beginner to advanced level, ensuring perfect comprehension.",
-      anchorId: "explainer"
+      path: "/explore"
     },
     {
       icon: <Sparkles className="w-8 h-8 text-blue-400" />,
       title: "Smart Quiz Generator",
       description: "Generates quizzes automatically based on topics to test and reinforce your knowledge.",
-      anchorId: "quiz"
+      path: "/quiz"
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-cyan-400" />,
       title: "Adaptive Difficulty",
       description: "Difficulty algorithms adapt dynamically based on student performance in real-time.",
-      anchorId: "quiz"
+      path: "/adaptive"
     },
     {
       icon: <MessageSquareMore className="w-8 h-8 text-emerald-400" />,
       title: "Doubt Solver",
       description: "Students can ask questions 24/7 and get instant, accurate, interactive answers.",
-      anchorId: "chat"
+      path: "/chat"
     },
     {
       icon: <Activity className="w-8 h-8 text-rose-400" />,
       title: "Progress Tracking",
       description: "Shows comprehensive performance stats, accuracy metrics, and learning streaks.",
-      anchorId: "dashboard"
+      path: "/dashboard"
     },
     {
       icon: <Route className="w-8 h-8 text-amber-400" />,
       title: "Personalized Learning Path",
       description: "AI creates a bespoke roadmap tailored to your specific strengths and weaknesses.",
-      anchorId: "subjects"
+      path: "/roadmap"
     }
   ];
 
@@ -82,7 +77,7 @@ export const FeaturesSection = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               whileHover={{ y: -10 }}
-              onClick={() => scrollToSection(feature.anchorId)}
+              onClick={() => navigate(feature.path)}
               className="glass p-8 rounded-2xl hover:shadow-[0_0_40px_rgba(139,92,246,0.2)] transition-all group border border-white/5 cursor-pointer relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-bl-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -98,7 +93,7 @@ export const FeaturesSection = () => {
               
               <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
                 <span>Launch Module</span>
-                <Route className="w-3 h-3" />
+                <ArrowUpRight className="w-3 h-3" />
               </div>
             </motion.div>
           ))}

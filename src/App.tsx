@@ -1,39 +1,37 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
-import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
-import { HeroSection } from './components/sections/HeroSection';
-import { AIConceptExplainer } from './components/explainer/AIConceptExplainer';
-import { FeaturesSection } from './components/sections/FeaturesSection';
-import { SubjectsSection } from './components/sections/SubjectsSection';
-import { ChatDemoSection } from './components/sections/ChatDemoSection';
-import { QuizGeneratorSection } from './components/sections/QuizGeneratorSection';
-import { DashboardSection } from './components/sections/DashboardSection';
-import { TestimonialsSection } from './components/sections/TestimonialsSection';
-import { PricingSection } from './components/sections/PricingSection';
-import { CTASection } from './components/sections/CTASection';
+import { PageLayout } from './components/layout/PageLayout';
+import Home from './pages/Home';
+import ExplainerPage from './pages/ExplainerPage';
+import RoadmapPage from './pages/RoadmapPage';
+import QuizPage from './pages/QuizPage';
+import DashboardPage from './pages/DashboardPage';
+import PricingPage from './pages/PricingPage';
+import TestimonialsPage from './pages/TestimonialsPage';
+import NotFoundPage from './pages/NotFoundPage';
+import AdaptiveLearningPage from './pages/AdaptiveLearningPage';
+import DoubtSolverPage from './pages/DoubtSolverPage';
 
 function App() {
   return (
     <AppProvider>
-      <div className="min-h-screen bg-[#0f172a] font-sans selection:bg-purple-500/30 selection:text-white">
-        <Navbar />
-        
-        <main>
-          <HeroSection />
-          <AIConceptExplainer />
-          <FeaturesSection />
-          <SubjectsSection />
-          <ChatDemoSection />
-          <QuizGeneratorSection />
-          <DashboardSection />
-          <TestimonialsSection />
-          <PricingSection />
-          <CTASection />
-        </main>
-
-        <Footer />
-      </div>
+      <Router>
+        <Routes>
+          <Route element={<PageLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/explore" element={<ExplainerPage />} />
+            <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/quiz" element={<QuizPage />} />
+            <Route path="/adaptive" element={<AdaptiveLearningPage />} />
+            <Route path="/chat" element={<DoubtSolverPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </Router>
     </AppProvider>
   );
 }
