@@ -1,16 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, BrainCircuit, Sparkles, Send, Loader2 } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 import { generateGroqChat, isGroqEnabled } from '../../lib/groq';
+import type { ChatMessage } from '../../utils/storage';
 
 export const ChatDemoSection = () => {
-  const [messages, setMessages] = useState([
-    { role: 'user', content: "What is Newton's Second Law?" },
-    { role: 'ai', content: "Newton's Second Law states that **Force = Mass × Acceleration** (F = ma).\n\nThis means the greater the mass of an object, the more force is needed to move or accelerate it." },
-    { role: 'user', content: "Can you give me an example?" },
-    { role: 'ai', content: "Of course! Imagine pushing a bicycle versus pushing a car.\n\nA car has much more **mass** than a bicycle, so you need to apply a much greater **force** to get it to move (accelerate) at the same speed." }
-  ]);
-  
+  const { chatHistory: messages, setChatHistory: setMessages } = useAppContext();
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -41,7 +37,11 @@ export const ChatDemoSection = () => {
     if (!inputValue.trim()) return;
 
     // Add user message
-    const userMsg = { role: 'user', content: inputValue };
+    const userMsg: ChatMessage = { 
+      role: 'user', 
+      content: inputValue, 
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    };
     const currentMessages = [...messages, userMsg];
     setMessages(currentMessages);
     setInputValue('');
@@ -53,12 +53,22 @@ export const ChatDemoSection = () => {
       }
 
       const aiResponse = await generateGroqChat(currentMessages);
-      setMessages(prev => [...prev, { role: 'ai', content: aiResponse }]);
+      const aiMsg: ChatMessage = { 
+        role: 'assistant', 
+        content: aiResponse, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      };
+      setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
       console.error("Groq Error:", error);
       // Fail gracefully: Use fallback
       let aiFallback = "That's a great question! I'm currently experiencing a connection issue with my local brain (Groq API), but in the real Conceptly platform, I provide deep breakdowns of exactly these kinds of topics.";
-      setMessages(prev => [...prev, { role: 'ai', content: aiFallback }]);
+      const errorMsg: ChatMessage = { 
+        role: 'assistant', 
+        content: aiFallback, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);
     }
@@ -130,13 +140,17 @@ export const ChatDemoSection = () => {
                     }`}>
                       {msg.role === 'user' ? <User className="w-4 h-4 text-blue-300" /> : <BrainCircuit className="w-4 h-4 text-purple-300" />}
                     </div>
-                    <div className={`p-4 rounded-2xl max-w-[80%] shadow-lg whitespace-pre-wrap ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-sm'
-                        : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm'
-                    }`}>
-                      {/* Very rough markdown bold replacement for prototype */}
-                      {msg.content.split('**').map((part, i) => i % 2 === 1 ? <strong key={i} className="text-white">{part}</strong> : part)}
+                    <div className="flex flex-col gap-1 max-w-[80%]">
+                      <div className={`p-4 rounded-2xl shadow-lg whitespace-pre-wrap ${
+                        msg.role === 'user'
+                          ? 'bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-sm'
+                          : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm'
+                      }`}>
+                        {msg.content.split('**').map((part, i) => i % 2 === 1 ? <strong key={i} className="text-white">{part}</strong> : part)}
+                      </div>
+                      <span className={`text-[10px] text-gray-500 px-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                        {msg.timestamp}
+                      </span>
                     </div>
                   </motion.div>
                 ))}

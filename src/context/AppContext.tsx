@@ -1,31 +1,31 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { generateGroqRoadmap } from '../lib/groq';
-
-export interface RoadmapMilestone {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  difficulty: string;
-  status: 'completed' | 'current' | 'locked';
-}
-
-interface DashboardStats {
-  accuracy: number;
-  streak: number;
-  hoursStudied: number;
-  quizCompletion: number;
-}
+import { 
+  saveToStorage, 
+  getFromStorage, 
+  STORAGE_KEYS
+} from '../utils/storage';
+import type { 
+  DashboardStats, 
+  RoadmapMilestone, 
+  ChatMessage,
+  ExplainerHistory,
+  QuizAttempt,
+  UserPreferences
+} from '../utils/storage';
 
 interface AppContextProps {
   // Dashboard Stats
   stats: DashboardStats;
-  updateStatsFromQuiz: (score: number, total: number) => void;
+  updateStatsFromQuiz: (score: number, total: number, difficulty: string) => void;
   
   // Navigation State
   activeQuizTopic: string;
   setActiveQuizTopic: (topic: string) => void;
+  
+  // Quiz History
+  quizHistory: QuizAttempt[];
   
   // Roadmap State
   roadmapGoal: string;
@@ -34,12 +34,34 @@ interface AppContextProps {
   isGeneratingRoadmap: boolean;
   generateRoadmap: (goal: string) => Promise<void>;
   
+  // AI Explainer State (Globalized)
+  recentTopics: string[];
+  setRecentTopics: React.Dispatch<React.SetStateAction<string[]>>;
+  lastExplanation: string;
+  setLastExplanation: (exp: string) => void;
+  explainerDifficulty: string;
+  setExplainerDifficulty: (diff: string) => void;
+
+  // AI Chat State (Globalized)
+  chatHistory: ChatMessage[];
+  setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+
+  // User Preferences
+  preferences: UserPreferences;
+  setPreferences: React.Dispatch<React.SetStateAction<UserPreferences>>;
+  
   // Chart Data
   weeklyData: { name: string; score: number }[];
   subjectProgress: { name: string; progress: number; color: string }[];
 }
 
-const defaultStats = {
+const defaultPreferences: UserPreferences = {
+  theme: 'dark',
+  defaultDifficulty: 'Medium',
+  notificationsEnabled: true
+};
+
+const defaultStats: DashboardStats = {
   accuracy: 65,
   streak: 5,
   hoursStudied: 12,
@@ -65,15 +87,92 @@ const initialSubjectProgress = [
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [stats, setStats] = useState<DashboardStats>(defaultStats);
+  // --- Initialize State from Storage ---
+  const [stats, setStats] = useState<DashboardStats>(() => 
+    getFromStorage(STORAGE_KEYS.STATS, defaultStats)
+  );
   const [activeQuizTopic, setActiveQuizTopic] = useState('Java Programming');
-  const [weeklyData, setWeeklyData] = useState(initialWeeklyData);
-  const [subjectProgress, setSubjectProgress] = useState(initialSubjectProgress);
+  const [weeklyData, setWeeklyData] = useState(() => 
+    getFromStorage(STORAGE_KEYS.WEEKLY_DATA, initialWeeklyData)
+  );
+  const [subjectProgress, setSubjectProgress] = useState(() => 
+    getFromStorage(STORAGE_KEYS.SUBJECT_PROGRESS, initialSubjectProgress)
+  );
   
   // Roadmap State
-  const [roadmapGoal, setRoadmapGoal] = useState('');
-  const [milestones, setMilestones] = useState<RoadmapMilestone[]>([]);
+  const [roadmapGoal, setRoadmapGoal] = useState(() => 
+    getFromStorage(STORAGE_KEYS.ROADMAP, { goal: '', milestones: [] }).goal
+  );
+  const [milestones, setMilestones] = useState<RoadmapMilestone[]>(() => 
+    getFromStorage(STORAGE_KEYS.ROADMAP, { goal: '', milestones: [] }).milestones
+  );
   const [isGeneratingRoadmap, setIsGeneratingRoadmap] = useState(false);
+
+  // AI Explainer State (Globalized)
+  const [recentTopics, setRecentTopics] = useState<string[]>(() => 
+    getFromStorage(STORAGE_KEYS.RECENT_TOPICS, ['Java Inheritance', 'Photosynthesis', 'Recursion'])
+  );
+  const [lastExplanation, setLastExplanation] = useState<string>(() => 
+    getFromStorage(STORAGE_KEYS.EXPLAINER_HISTORY, { explanation: '' }).explanation
+  );
+  const [explainerDifficulty, setExplainerDifficulty] = useState<string>('Beginner');
+
+  // AI Chat State (Globalized)
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>(() => 
+    getFromStorage(STORAGE_KEYS.CHAT_HISTORY, [
+      { role: 'assistant', content: "Hello! I'm Conceptly AI. How can I help you today?", timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+    ])
+  );
+
+  // Quiz History
+  const [quizHistory, setQuizHistory] = useState<QuizAttempt[]>(() => 
+    getFromStorage(STORAGE_KEYS.QUIZ_HISTORY, [])
+  );
+
+  // Preferences
+  const [preferences, setPreferences] = useState<UserPreferences>(() => 
+    getFromStorage(STORAGE_KEYS.PREFERENCES, defaultPreferences)
+  );
+
+  // --- Persistence Sync (Effect Watchers) ---
+  
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.STATS, stats);
+  }, [stats]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.WEEKLY_DATA, weeklyData);
+  }, [weeklyData]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.SUBJECT_PROGRESS, subjectProgress);
+  }, [subjectProgress]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.ROADMAP, { goal: roadmapGoal, milestones });
+  }, [roadmapGoal, milestones]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.RECENT_TOPICS, recentTopics);
+  }, [recentTopics]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.CHAT_HISTORY, chatHistory);
+  }, [chatHistory]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.EXPLAINER_HISTORY, { explanation: lastExplanation });
+  }, [lastExplanation]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.QUIZ_HISTORY, quizHistory);
+  }, [quizHistory]);
+
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.PREFERENCES, preferences);
+  }, [preferences]);
+
+  // --- Methods ---
 
   const generateRoadmap = useCallback(async (goal: string) => {
     if (!goal.trim()) return;
@@ -96,11 +195,23 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const updateStatsFromQuiz = (score: number, total: number) => {
+  const updateStatsFromQuiz = (score: number, total: number, difficulty: string) => {
     const percentage = Math.round((score / total) * 100);
     
+    // Add to History
+    const newAttempt: QuizAttempt = {
+      id: Date.now().toString(),
+      topic: activeQuizTopic,
+      score,
+      total,
+      difficulty,
+      date: new Date().toISOString()
+    };
+    setQuizHistory(prev => [newAttempt, ...prev].slice(0, 50)); // Keep last 50
+
     setStats(prev => ({
       ...prev,
+      // Weighted average for accuracy
       accuracy: Math.round((prev.accuracy * 0.7) + (percentage * 0.3)),
       quizCompletion: Math.min(100, prev.quizCompletion + 5),
       streak: prev.streak + 1,
@@ -129,11 +240,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       updateStatsFromQuiz,
       activeQuizTopic,
       setActiveQuizTopic,
+      quizHistory,
       roadmapGoal,
       setRoadmapGoal,
       milestones,
       isGeneratingRoadmap,
       generateRoadmap,
+      recentTopics,
+      setRecentTopics,
+      lastExplanation,
+      setLastExplanation,
+      explainerDifficulty,
+      setExplainerDifficulty,
+      chatHistory,
+      setChatHistory,
+      preferences,
+      setPreferences,
       weeklyData,
       subjectProgress
     }}>

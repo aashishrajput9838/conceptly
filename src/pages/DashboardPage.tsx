@@ -2,8 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { DashboardSection } from '../components/sections/DashboardSection';
 import { BarChart3 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const DashboardPage = () => {
+  const { user } = useAuth();
   return (
     <div className="pb-20">
       <div className="bg-[#0f172a] py-12 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-rose-900/10 via-transparent to-transparent">
@@ -22,27 +24,31 @@ const DashboardPage = () => {
               <span className="text-rose-400 font-medium">Dashboard</span>
             </nav>
           </motion.div>
-          <motion.h1 
+          
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold text-white tracking-tight"
+            className="flex flex-col gap-2"
           >
-            Performance <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-pink-500">Analytics</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-4 text-gray-400 text-lg max-w-2xl"
-          >
-            Your comprehensive progress hub. Monitor your learning streaks, quiz scores, and academic growth in one beautiful place.
-          </motion.p>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+              Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-pink-500">{user?.fullName.split(' ')[0]}</span>
+            </h1>
+            <p className="text-gray-400 text-lg max-w-2xl mt-2">
+              Your comprehensive progress hub. Monitor your learning streaks, quiz scores, and academic growth in one beautiful place.
+            </p>
+          </motion.div>
         </div>
       </div>
       <DashboardSection />
     </div>
   );
 };
+
+
+// Internal Import helper
+import { Sparkles, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 
 export default DashboardPage;
