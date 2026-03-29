@@ -36,6 +36,7 @@ export const CTASection = () => {
              <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => document.getElementById('explainer')?.scrollIntoView({ behavior: 'smooth' })}
                 className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-10 py-5 rounded-full font-bold shadow-[0_4px_30px_rgba(139,92,246,0.4)] transition-all flex items-center justify-center gap-2 text-lg"
               >
                 Get Started Free

@@ -28,7 +28,7 @@ export const DashboardSection = () => {
   };
 
   return (
-    <section id="dashboard" className="py-24 bg-[#0f172a] relative overflow-hidden">
+    <section id="dashboard" className="py-24 bg-[#0f172a] relative overflow-hidden scroll-mt-20">
       <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b]/50 to-transparent pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

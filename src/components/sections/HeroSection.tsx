@@ -34,6 +34,7 @@ export const HeroSection = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => document.getElementById('explainer')?.scrollIntoView({ behavior: 'smooth' })}
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-shadow"
             >
               Start Learning <ArrowRight className="w-5 h-5" />
@@ -41,6 +42,7 @@ export const HeroSection = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => document.getElementById('chat')?.scrollIntoView({ behavior: 'smooth' })}
               className="glass text-white px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
             >
               Watch Demo <PlayCircle className="w-5 h-5" />

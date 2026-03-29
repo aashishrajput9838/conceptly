@@ -28,7 +28,7 @@ export const FeaturesSection = () => {
       icon: <TrendingUp className="w-8 h-8 text-cyan-400" />,
       title: "Adaptive Difficulty",
       description: "Difficulty algorithms adapt dynamically based on student performance in real-time.",
-      anchorId: "explainer"
+      anchorId: "quiz"
     },
     {
       icon: <MessageSquareMore className="w-8 h-8 text-emerald-400" />,
@@ -46,12 +46,12 @@ export const FeaturesSection = () => {
       icon: <Route className="w-8 h-8 text-amber-400" />,
       title: "Personalized Learning Path",
       description: "AI creates a bespoke roadmap tailored to your specific strengths and weaknesses.",
-      anchorId: "explainer"
+      anchorId: "subjects"
     }
   ];
 
   return (
-    <section id="features" className="py-24 bg-[#0f172a] relative z-10">
+    <section id="features" className="py-24 bg-[#0f172a] relative z-10 scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.h2 

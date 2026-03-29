@@ -29,7 +29,10 @@ export const Navbar = () => {
                   {link}
                 </a>
               ))}
-              <button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+              <button 
+                onClick={() => document.getElementById('explainer')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+              >
                 Get Started
               </button>
             </div>
@@ -62,7 +65,13 @@ export const Navbar = () => {
                 {link}
               </a>
             ))}
-            <button className="w-full text-center mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium">
+            <button 
+              onClick={() => {
+                setIsOpen(false);
+                document.getElementById('explainer')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="w-full text-center mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium"
+            >
               Get Started
             </button>
           </div>

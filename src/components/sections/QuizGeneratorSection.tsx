@@ -123,7 +123,7 @@ export const QuizGeneratorSection = () => {
   };
 
   return (
-    <section id="quiz" className="py-24 bg-[#0f172a] relative overflow-hidden">
+    <section id="quiz" className="py-24 bg-[#0f172a] relative overflow-hidden scroll-mt-20">
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none" />
 
