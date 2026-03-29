@@ -41,7 +41,7 @@
 
 @layer utilities {
   .glass {
-    @apply bg-opacity-70 backdrop-blur-md border border-white/10;
+    @apply bg-[#1e293b]/70 backdrop-blur-md border border-white/10;
   }
 }
 

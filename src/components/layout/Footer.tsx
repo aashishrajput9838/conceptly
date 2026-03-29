@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, Heart, Github, Twitter, Linkedin } from 'lucide-react';
+import { Brain, Heart, Globe, Mail, MessageCircle } from 'lucide-react';
 
 export const Footer = () => {
   return (
@@ -20,13 +20,13 @@ export const Footer = () => {
             </p>
             <div className="flex space-x-4 mt-6">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
+                <Globe className="w-5 h-5" />
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
+                <MessageCircle className="w-5 h-5" />
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
+                <Mail className="w-5 h-5" />
               </a>
             </div>
           </div>
