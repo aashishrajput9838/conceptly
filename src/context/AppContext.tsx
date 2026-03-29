@@ -67,10 +67,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     // Update the chart (fake a new data point or just bump 'Today')
     setWeeklyData(prev => {
-      const newData = [...prev];
-      const today = newData[newData.length - 1];
-      today.score = Math.min(100, Math.round((today.score + percentage) / 2));
-      return newData;
+      return prev.map((item, index) => {
+        if (index === prev.length - 1) {
+          return {
+            ...item,
+            score: Math.min(100, Math.round((item.score + percentage) / 2))
+          };
+        }
+        return item;
+      });
     });
 
     // Update a random subject progress

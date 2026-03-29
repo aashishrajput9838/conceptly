@@ -114,6 +114,7 @@ export const QuizGeneratorSection = () => {
   };
 
   const calculateScore = () => {
+    if (questions.length === 0) return 0;
     let score = 0;
     questions.forEach((q, i) => {
       if (answers[i] === q.answer) score++;
